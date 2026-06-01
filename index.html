@@ -178,6 +178,74 @@
     background: var(--accent-light);
     flex-shrink: 0;
     padding: 12px;
+    cursor: zoom-in;
+    transition: opacity 0.2s;
+  }
+
+  .card-img:hover { opacity: 0.8; }
+
+  /* ── IMAGE ZOOM MODAL ── */
+  .img-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s;
+    padding: 20px;
+  }
+
+  .img-modal.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .img-modal-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .img-modal img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .img-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    color: #1a1714;
+    font-size: 32px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .img-modal-close:hover {
+    background: white;
+    transform: scale(1.1);
   }
 
   .card-img-placeholder {
@@ -307,6 +375,14 @@
 <div style="position:fixed; top:14px; right:16px; z-index:999; display:flex; gap:6px;">
   <button onclick="setLang('en')" id="btn-en" style="border:1.5px solid #c8a96e; background:#fff; color:#c8a96e; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; padding:5px 12px; border-radius:50px; cursor:pointer; transition:all 0.2s;">EN</button>
   <button onclick="setLang('pt')" id="btn-pt" style="border:1.5px solid #e8e2d9; background:#fff; color:#7a7167; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; padding:5px 12px; border-radius:50px; cursor:pointer; transition:all 0.2s;">PT</button>
+</div>
+
+<!-- IMAGE ZOOM MODAL -->
+<div class="img-modal" id="imgModal">
+  <div class="img-modal-content">
+    <img id="modalImg" alt="Zoomed image">
+    <button class="img-modal-close" onclick="closeImageModal()">&times;</button>
+  </div>
 </div>
 
 <!-- HEADER -->
@@ -509,6 +585,35 @@
   });
 
   filter('all');
+
+  // ── IMAGE ZOOM ──
+  const imgModal = document.getElementById('imgModal');
+  const modalImg = document.getElementById('modalImg');
+
+  function openImageModal(src) {
+    modalImg.src = src;
+    imgModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeImageModal() {
+    imgModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  imgModal.addEventListener('click', (e) => {
+    if (e.target === imgModal) closeImageModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeImageModal();
+  });
+
+  document.querySelectorAll('.card-img').forEach(img => {
+    img.addEventListener('click', function() {
+      openImageModal(this.src);
+    });
+  });
 </script>
 </body>
 </html>
