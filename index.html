@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Flohmarkt · Michelle · Köln</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --text: #1a1714;
+    --muted: #7a7167;
+    --accent: #c8a96e;
+    --accent-light: #f5efe4;
+    --border: #e8e2d9;
+    --tag-furniture: #d4e8d4;
+    --tag-clothing: #d4dff0;
+    --tag-other: #eeddd4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 24px 32px;
+    text-align: center;
+  }
+
+  .header-tag {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 50px;
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 44px);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  header p {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+    max-width: 460px;
+    margin-inline: auto;
+    line-height: 1.6;
+  }
+
+  /* ── CONTACT BAR ── */
+  .contact-bar {
+    background: var(--text);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 14px 24px;
+    flex-wrap: wrap;
+  }
+
+  .contact-bar span {
+    font-size: 13px;
+    opacity: 0.7;
+    letter-spacing: 0.5px;
+  }
+
+  .contact-bar a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s;
+  }
+
+  .contact-bar a:hover { opacity: 0.8; }
+
+  /* ── FILTERS ── */
+  .filters-wrap {
+    padding: 24px 24px 8px;
+    max-width: 960px;
+    margin-inline: auto;
+  }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-btn.active {
+    background: var(--text);
+    border-color: var(--text);
+    color: white;
+  }
+
+  .results-count {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    padding: 20px 24px 60px;
+    max-width: 960px;
+    margin-inline: auto;
+    align-items: stretch;
+  }
+
+  /* ── CARD — equal height layout ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+  }
+
+  .card.hidden { display: none; }
+
+  .card-img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    display: block;
+    background: var(--accent-light);
+    flex-shrink: 0;
+    padding: 12px;
+  }
+
+  .card-img-placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #f5efe4, #ede4d6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .card-img-placeholder svg { opacity: 0.5; }
+  .card-img-placeholder span { font-size: 12px; opacity: 0.6; }
+
+  .card-body {
+    padding: 16px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .card-category {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 50px;
+    margin-bottom: 10px;
+    align-self: flex-start;
+  }
+
+  .cat-furniture { background: var(--tag-furniture); color: #2d6b2d; }
+  .cat-clothing  { background: var(--tag-clothing);  color: #1e3a6b; }
+  .cat-other     { background: var(--tag-other);     color: #7a3820; }
+  .cat-appliances { background: #e8e0f0; color: #4a2080; }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 14px;
+    flex: 1;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .price {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .price span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-right: 2px;
+  }
+
+  .btn-whatsapp {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-whatsapp:hover { background: #1dba57; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--muted);
+    grid-column: 1/-1;
+  }
+
+  .empty.visible { display: block; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE TOGGLE -->
+<div style="position:fixed; top:14px; right:16px; z-index:999; display:flex; gap:6px;">
+  <button onclick="setLang('en')" id="btn-en" style="border:1.5px solid #c8a96e; background:#fff; color:#c8a96e; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; padding:5px 12px; border-radius:50px; cursor:pointer; transition:all 0.2s;">EN</button>
+  <button onclick="setLang('pt')" id="btn-pt" style="border:1.5px solid #e8e2d9; background:#fff; color:#7a7167; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; padding:5px 12px; border-radius:50px; cursor:pointer; transition:all 0.2s;">PT</button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-tag">✦ Online Flohmarkt · Köln ✦</div>
+  <h1 data-en="Moving Out Sale" data-pt="Venda de Mudança">Moving Out Sale</h1>
+  <p data-en="Loved pieces looking for a new home. Everything is in great condition — grab a deal before it's gone!" data-pt="Peças especiais buscando um novo lar. Tudo em ótimo estado — aproveite antes que acabe!">Loved pieces looking for a new home. Everything is in great condition — grab a deal before it's gone!</p>
+  <p style="margin-top: 14px; font-weight: 600; color: var(--text); font-size: 14px;"
+     data-en="All items are in Köln, Niehl · Pick-up only · Arrange via WhatsApp."
+     data-pt="Todos os itens estão em Köln, Niehl · Somente retirada · Combinar via WhatsApp.">All items are in Köln, Niehl · Pick-up only · Arrange via WhatsApp.</p>
+</header>
+
+<!-- CONTACT BAR -->
+<div class="contact-bar">
+  <span>Michelle · Köln, Germany</span>
+  <a href="https://wa.me/4917636727202" target="_blank">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    <span data-en="Message on WhatsApp" data-pt="Falar no WhatsApp">Message on WhatsApp</span>
+  </a>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-wrap">
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all" data-en="All Items" data-pt="Todos">All Items</button>
+    <button class="filter-btn" data-filter="furniture" data-en="🛋 Furniture & Appliances" data-pt="🛋 Móveis & Eletrodomésticos">🛋 Furniture & Appliances</button>
+    <button class="filter-btn" data-filter="clothing" data-en="👗 Clothing — Coming Soon" data-pt="👗 Roupas — Em Breve">👗 Clothing — Coming Soon</button>
+    <button class="filter-btn" data-filter="other" data-en="📦 Other" data-pt="📦 Outros">📦 Other</button>
+  </div>
+  <p class="results-count" id="count"></p>
+</div>
+
+<!-- PRODUCT GRID -->
+<div class="grid" id="grid">
+
+  <!-- CARD 1 — BRIMNES -->
+  <div class="card" data-category="furniture">
+    <img src="fotos/brimnes-cama.png" class="card-img" alt="IKEA BRIMNES Day Bed">
+    <div class="card-body">
+      <span class="card-category cat-furniture" data-en="Furniture &amp; Appliances" data-pt="Móveis &amp; Eletrodomésticos">Furniture &amp; Appliances</span>
+      <h2 class="card-title">IKEA BRIMNES Day Bed</h2>
+      <p class="card-desc"
+         data-en="Sofa by day, single or double bed by night. Comes complete with 2 pocket spring mattresses (VANNAREID, firm, 80×200 cm each) and 2 storage drawers. Frame: 86×205 cm — extends to a full 160×205 cm double bed. Everything included, ready to use. 🗓 Purchased May 2025 — barely used."
+         data-pt="Sofá durante o dia, cama de solteiro ou casal à noite. Inclui 2 colchões de molas ensacadas (VANNAREID, firme, 80×200 cm cada) e 2 gavetas de armazenamento. Estrutura: 86×205 cm — abre para 160×205 cm como cama de casal. Tudo incluído, pronto para usar. 🗓 Comprado em maio 2025 — quase sem uso.">Sofa by day, single or double bed by night. Comes complete with 2 pocket spring mattresses (VANNAREID, firm, 80×200 cm each) and 2 storage drawers. Frame: 86×205 cm — extends to a full 160×205 cm double bed. Everything included, ready to use. 🗓 Purchased May 2025 — barely used.</p>
+      <div class="card-footer">
+        <div class="price"><span>€</span>314.90</div>
+        <a class="btn-whatsapp" href="https://wa.me/4917636727202?text=Hi%20Michelle!%20I%27m%20interested%20in%20the%20IKEA%20BRIMNES%20Day%20Bed%20for%20%E2%82%AC314.90." target="_blank"
+           data-en="I'm interested" data-pt="Tenho interesse">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          I'm interested
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2 — FABRIKÖR -->
+  <div class="card" data-category="furniture">
+    <img src="fotos/fabrikoer-display-cabinet.jpeg" class="card-img" alt="IKEA FABRIKÖR Display Cabinet">
+    <div class="card-body">
+      <span class="card-category cat-furniture" data-en="Furniture &amp; Appliances" data-pt="Móveis &amp; Eletrodomésticos">Furniture &amp; Appliances</span>
+      <h2 class="card-title">IKEA FABRIKÖR Display Cabinet</h2>
+      <p class="card-desc"
+         data-en="Navy blue retro-style cabinet with tempered glass doors and powder-coated steel frame. Adjustable shelves, height-adjustable feet, key lock included. 81 × 42 × 113 cm. A real statement piece for any room. 🗓 Purchased May 2025 — barely used."
+         data-pt="Cristaleira estilo retrô azul marinho com portas de vidro temperado e estrutura de aço. Prateleiras ajustáveis, pés reguláveis e fechadura com chave incluída. 81 × 42 × 113 cm. Um móvel que transforma qualquer ambiente. 🗓 Comprado em maio 2025 — quase sem uso.">Navy blue retro-style cabinet with tempered glass doors and powder-coated steel frame. Adjustable shelves, height-adjustable feet, key lock included. 81 × 42 × 113 cm. A real statement piece for any room. 🗓 Purchased May 2025 — barely used.</p>
+      <div class="card-footer">
+        <div class="price"><span>€</span>134.90</div>
+        <a class="btn-whatsapp" href="https://wa.me/4917636727202?text=Hi%20Michelle!%20I%27m%20interested%20in%20the%20IKEA%20FABRIK%C3%96R%20Display%20Cabinet%20for%20%E2%82%AC134.90." target="_blank"
+           data-en="I'm interested" data-pt="Tenho interesse">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          I'm interested
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3 — LEXI -->
+  <div class="card" data-category="furniture">
+    <img src="fotos/lexi-lounge-set.png" class="card-img" alt="LEXI Outdoor Lounge Set">
+    <div class="card-body">
+      <span class="card-category cat-furniture" data-en="Furniture &amp; Appliances" data-pt="Móveis &amp; Eletrodomésticos">Furniture &amp; Appliances</span>
+      <h2 class="card-title">LEXI Outdoor Lounge Set — 4 pieces</h2>
+      <p class="card-desc"
+         data-en="3-piece lounge group (corner sofa + 2 elements + hocker) plus 1 extra armchair. Solid acacia wood frame, wool-white water-resistant fabric with removable washable covers. 131 × 131 × 73 cm. Modular — rearrange as you like. Perfect for a balcony or terrace. 🗓 Purchased March 2025 — barely used."
+         data-pt="Conjunto lounge 3 peças (sofá de canto + 2 elementos + puff) mais 1 poltrona extra. Estrutura em madeira maciça de acácia, tecido branco lã resistente à água com capas removíveis e laváveis. 131 × 131 × 73 cm. Modular — organize como quiser. Perfeito para varanda ou terraço. 🗓 Comprado em março 2025 — quase sem uso.">3-piece lounge group (corner sofa + 2 elements + hocker) plus 1 extra armchair. Solid acacia wood frame, wool-white water-resistant fabric with removable washable covers. 131 × 131 × 73 cm. Modular — rearrange as you like. Perfect for a balcony or terrace. 🗓 Purchased March 2025 — barely used.</p>
+      <div class="card-footer">
+        <div class="price"><span>€</span>479.90</div>
+        <a class="btn-whatsapp" href="https://wa.me/4917636727202?text=Hi%20Michelle!%20I%27m%20interested%20in%20the%20LEXI%20Outdoor%20Lounge%20Set%20for%20%E2%82%AC479.90." target="_blank"
+           data-en="I'm interested" data-pt="Tenho interesse">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          I'm interested
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 4 — LG FRIDGE -->
+  <div class="card" data-category="furniture">
+    <!-- Troque pelo nome da sua foto: <img src="fotos/lg-geladeira.jpg" class="card-img" alt="LG Side-by-Side Fridge"> -->
+    <div class="card-img-placeholder">
+      <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      <span data-en="Add a photo" data-pt="Adicione uma foto">Add a photo</span>
+    </div>
+    <div class="card-body">
+      <span class="card-category cat-appliances" data-en="Furniture & Appliances" data-pt="Móveis & Eletrodomésticos">Furniture & Appliances</span>
+      <h2 class="card-title">LG Side-by-Side Fridge GSM32HSBEH</h2>
+      <p class="card-desc"
+         data-en="Premium side-by-side fridge-freezer. 562 L total capacity (371 L fridge + 191 L freezer). Total No Frost — never needs defrosting. Ice, crushed ice & water dispenser (no plumbing needed). 91 × 178.6 × 69.3 cm. LED interior lighting, touch display, 5 glass shelves. Very quiet at 42 dB. 🗓 Purchased May 2024 — excellent condition."
+         data-pt="Geladeira side-by-side premium. 562 L de capacidade total (371 L refrigerador + 191 L freezer). Total No Frost — nunca precisa descongelar. Dispensador de gelo, gelo picado e água (sem encanamento). 91 × 178,6 × 69,3 cm. Iluminação LED interna, display touch, 5 prateleiras de vidro. Muito silenciosa, 42 dB. 🗓 Comprada em maio 2024 — excelente estado.">Premium side-by-side fridge-freezer. 562 L total capacity (371 L fridge + 191 L freezer). Total No Frost — never needs defrosting. Ice, crushed ice & water dispenser (no plumbing needed). 91 × 178.6 × 69.3 cm. LED interior lighting, touch display, 5 glass shelves. Very quiet at 42 dB. 🗓 Purchased May 2024 — excellent condition.</p>
+      <div class="card-footer">
+        <div class="price"><span>€</span>774.90</div>
+        <a class="btn-whatsapp" href="https://wa.me/4917636727202?text=Hi%20Michelle!%20I%27m%20interested%20in%20the%20LG%20Side-by-Side%20Fridge%20for%20%E2%82%AC774.90." target="_blank"
+           data-en="I'm interested" data-pt="Tenho interesse">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.467-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          I'm interested
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOTHING BANNER -->
+  <div class="card" data-category="clothing" style="border: 1.5px dashed var(--accent); background: var(--accent-light);">
+    <div class="card-body" style="padding: 32px 24px; text-align: center; align-items: center; justify-content: center; min-height: 200px;">
+      <div style="font-size: 36px; margin-bottom: 12px;">👗</div>
+      <h2 class="card-title" style="margin-bottom: 10px;" data-en="Clothing — Coming Soon" data-pt="Roupas — Em Breve">Clothing — Coming Soon</h2>
+      <p class="card-desc" style="text-align: center;"
+         data-en="I'll be selling clothes at a local Flohmarkt in Köln! Address and date to be announced soon. Stay tuned!"
+         data-pt="Estarei vendendo roupas num Flohmarkt presencial em Köln! Endereço e data em breve. Fique ligada!">I'll be selling clothes at a local Flohmarkt in Köln! Address and date to be announced soon. Stay tuned!</p>
+    </div>
+  </div>
+
+  <div class="empty" id="empty" data-en="No items in this category right now." data-pt="Nenhum item nesta categoria no momento.">No items in this category right now.</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span data-en="All items are in Köln, Niehl · Pick-up only · Arrange via WhatsApp" data-pt="Todos os itens estão em Köln, Niehl · Somente retirada · Combinar via WhatsApp">All items are in Köln, Niehl · Pick-up only · Arrange via WhatsApp</span>
+</footer>
+
+<script>
+  // ── LANGUAGE ──
+  let currentLang = 'en';
+
+  function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const text = el.getAttribute('data-' + lang);
+      if (!text) return;
+      const svg = el.querySelector('svg');
+      if (svg) {
+        el.textContent = text;
+        el.insertBefore(svg, el.firstChild);
+      } else {
+        el.textContent = text;
+      }
+    });
+    const enBtn = document.getElementById('btn-en');
+    const ptBtn = document.getElementById('btn-pt');
+    enBtn.style.borderColor = lang === 'en' ? '#c8a96e' : '#e8e2d9';
+    enBtn.style.color       = lang === 'en' ? '#c8a96e' : '#7a7167';
+    ptBtn.style.borderColor = lang === 'pt' ? '#c8a96e' : '#e8e2d9';
+    ptBtn.style.color       = lang === 'pt' ? '#c8a96e' : '#7a7167';
+    updateCount(document.querySelectorAll('.card[data-category]:not(.hidden)').length);
+  }
+
+  // ── FILTERS ──
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.card[data-category]');
+  const countEl = document.getElementById('count');
+  const emptyEl = document.getElementById('empty');
+
+  function updateCount(visible) {
+    if (currentLang === 'pt') {
+      countEl.textContent = visible === cards.length
+        ? `${visible} itens disponíveis`
+        : `${visible} item${visible !== 1 ? 'ns' : ''} encontrado${visible !== 1 ? 's' : ''}`;
+    } else {
+      countEl.textContent = visible === cards.length
+        ? `${visible} items available`
+        : `${visible} item${visible !== 1 ? 's' : ''} found`;
+    }
+  }
+
+  function filter(cat) {
+    let visible = 0;
+    cards.forEach(card => {
+      const match = cat === 'all' || card.dataset.category === cat;
+      card.classList.toggle('hidden', !match);
+      if (match) visible++;
+    });
+    emptyEl.classList.toggle('visible', visible === 0);
+    updateCount(visible);
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filter(btn.dataset.filter);
+    });
+  });
+
+  filter('all');
+</script>
+</body>
+</html>
