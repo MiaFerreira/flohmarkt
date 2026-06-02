@@ -480,10 +480,15 @@
 
   <!-- CARD 4 — LG FRIDGE -->
   <div class="card" data-category="furniture">
-    <!-- Troque pelo nome da sua foto: <img src="fotos/lg-geladeira.jpg" class="card-img" alt="LG Side-by-Side Fridge"> -->
-    <div class="card-img-placeholder">
-      <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-      <span data-en="Add a photo" data-pt="Adicione uma foto">Add a photo</span>
+    <div class="card-carousel" style="position:relative; width:100%; aspect-ratio:1/1; background:var(--accent-light); overflow:hidden; flex-shrink:0;">
+      <img src="fotos/lg-geladeira-1.png" class="card-img" alt="LG Side-by-Side Fridge" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; padding:12px; opacity:1; transition:opacity 0.4s; cursor:zoom-in;">
+      <img src="fotos/lg-geladeira-2.png" class="card-img" alt="LG Side-by-Side Fridge interior" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; padding:12px; opacity:0; transition:opacity 0.4s; cursor:zoom-in;">
+      <button onclick="prevSlide(this)" style="position:absolute; left:8px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.85); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,0.15);">‹</button>
+      <button onclick="nextSlide(this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.85); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,0.15);">›</button>
+      <div style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px;">
+        <span class="dot active" style="width:6px; height:6px; border-radius:50%; background:var(--accent); display:inline-block; transition:opacity 0.3s;"></span>
+        <span class="dot" style="width:6px; height:6px; border-radius:50%; background:var(--accent); opacity:0.35; display:inline-block; transition:opacity 0.3s;"></span>
+      </div>
     </div>
     <div class="card-body">
       <span class="card-category cat-appliances" data-en="Furniture & Appliances" data-pt="Móveis & Eletrodomésticos">Furniture & Appliances</span>
@@ -614,6 +619,29 @@
       openImageModal(this.src);
     });
   });
+
+  // ── CAROUSEL ──
+  function getCarousel(btn) {
+    return btn.closest('.card-carousel');
+  }
+  function setSlide(carousel, index) {
+    const imgs = carousel.querySelectorAll('.card-img');
+    const dots = carousel.querySelectorAll('.dot');
+    imgs.forEach((img, i) => img.style.opacity = i === index ? '1' : '0');
+    dots.forEach((dot, i) => dot.style.opacity = i === index ? '1' : '0.35');
+    carousel.dataset.slide = index;
+  }
+  function nextSlide(btn) {
+    const c = getCarousel(btn);
+    const imgs = c.querySelectorAll('.card-img');
+    setSlide(c, (parseInt(c.dataset.slide || 0) + 1) % imgs.length);
+  }
+  function prevSlide(btn) {
+    const c = getCarousel(btn);
+    const imgs = c.querySelectorAll('.card-img');
+    setSlide(c, (parseInt(c.dataset.slide || 0) - 1 + imgs.length) % imgs.length);
+  }
+  document.querySelectorAll('.card-carousel').forEach(c => c.dataset.slide = '0');
 </script>
 </body>
 </html>
