@@ -403,6 +403,19 @@
   /* extra bottom padding so last card isn't hidden by bar */
   body.bar-open { padding-bottom: 80px; }
 
+  /* ── PICKUP NOTE ── */
+  .card-pickup {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    border-radius: 0 8px 8px 0;
+  }
+
   /* ── EMPTY STATE ── */
   .empty {
     display: none;
@@ -528,7 +541,7 @@
   <div class="card" data-category="furniture" data-name="LG Side-by-Side Fridge GSM32HSBEH" data-price="774.90">
     <div class="card-carousel" style="position:relative; width:100%; aspect-ratio:1/1; background:var(--accent-light); overflow:hidden; flex-shrink:0;">
       <img src="fotos/lg-geladeira-1.png" class="card-img" alt="LG Side-by-Side Fridge" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; padding:12px; opacity:1; transition:opacity 0.4s; cursor:zoom-in;">
-      <img src="fotos/lg-geladeira-2.png" class="card-img" alt="LG Side-by-Side Fridge interior" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; padding:12px; opacity:0; transition:opacity 0.4s; cursor:zoom-in;">
+      <img src="fotos/lg-geladeira-2.png" class="card-img" alt="LG Side-by-Side Fridge interior" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; padding:12px; opacity:0; pointer-events:none; transition:opacity 0.4s; cursor:zoom-in;">
       <button onclick="prevSlide(this)" style="position:absolute; left:8px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.85); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,0.15);">‹</button>
       <button onclick="nextSlide(this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.85); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,0.15);">›</button>
       <div style="position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px;">
@@ -542,6 +555,9 @@
       <p class="card-desc"
          data-en="Premium side-by-side fridge-freezer. 562 L total capacity (371 L fridge + 191 L freezer). Total No Frost — never needs defrosting. Ice, crushed ice & water dispenser (no plumbing needed). 91 × 178.6 × 69.3 cm. LED interior lighting, touch display, 5 glass shelves. Very quiet at 42 dB. 🗓 Purchased May 2024 — excellent condition."
          data-pt="Geladeira side-by-side premium. 562 L de capacidade total (371 L geladeira + 191 L freezer). Total No Frost — nunca precisa descongelar. Dispenser de gelo, gelo picado e água (sem instalação hidráulica). 91 × 178,6 × 69,3 cm. Iluminação LED interna, painel touch, 5 prateleiras de vidro. Super silenciosa, 42 dB. 🗓 Comprada em maio 2024 — estado impecável.">Premium side-by-side fridge-freezer. 562 L total capacity (371 L fridge + 191 L freezer). Total No Frost — never needs defrosting. Ice, crushed ice & water dispenser (no plumbing needed). 91 × 178.6 × 69.3 cm. LED interior lighting, touch display, 5 glass shelves. Very quiet at 42 dB. 🗓 Purchased May 2024 — excellent condition.</p>
+      <p class="card-pickup"
+         data-en="📅 Pick-up available July 23–29 only — I'm moving on July 30, so I'll need it just a little longer! 😊 After that, it's all yours. Reserve it now with a 50% deposit and pay the rest when you pick it up!"
+         data-pt="📅 Retirada disponível somente entre 23 e 29 de julho — me mudo no dia 30 e ainda vou precisar dela por mais um tempinho! 😊 Depois ela é toda sua. Reserve agora com 50% de entrada e pague o restante na hora da retirada!">📅 Pick-up available July 23–29 only — I'm moving on July 30, so I'll need it just a little longer! 😊 After that, it's all yours. Reserve it now with a 50% deposit and pay the rest when you pick it up!</p>
       <div class="card-footer">
         <div class="price"><span>€</span>774.90</div>
         <button class="btn-interest" onclick="toggleInterest(this)" data-en="I'm interested" data-pt="Tenho interesse">I'm interested</button>
@@ -593,6 +609,8 @@
       if (svg) {
         el.textContent = text;
         el.insertBefore(svg, el.firstChild);
+      } else if (el.classList.contains('card-desc')) {
+        el.innerHTML = text;
       } else {
         el.textContent = text;
       }
@@ -646,6 +664,7 @@
   });
 
   filter('all');
+  setLang('en');
 
   // ── IMAGE ZOOM ──
   const imgModal = document.getElementById('imgModal');
@@ -672,6 +691,7 @@
 
   document.querySelectorAll('.card-img').forEach(img => {
     img.addEventListener('click', function() {
+      if (this.style.opacity === '0') return;
       openImageModal(this.src);
     });
   });
@@ -683,7 +703,10 @@
   function setSlide(carousel, index) {
     const imgs = carousel.querySelectorAll('.card-img');
     const dots = carousel.querySelectorAll('.dot');
-    imgs.forEach((img, i) => img.style.opacity = i === index ? '1' : '0');
+    imgs.forEach((img, i) => {
+      img.style.opacity = i === index ? '1' : '0';
+      img.style.pointerEvents = i === index ? 'auto' : 'none';
+    });
     dots.forEach((dot, i) => dot.style.opacity = i === index ? '1' : '0.35');
     carousel.dataset.slide = index;
   }
